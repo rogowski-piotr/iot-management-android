@@ -6,24 +6,37 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.sensormanagement.activity.ShowMeasurements;
+import com.example.sensormanagement.database.MeasurementDbHelper;
+import com.example.sensormanagement.dto.SensorResponse;
 import com.example.sensormanagement.service.MeasurementExecutorService;
+
+import java.time.LocalDateTime;
 
 public class MainActivity extends AppCompatActivity {
     private TextView textViewInfo;
+    private TextView textViewError;
     private MeasurementExecutorService measurementExecutorService;
     private boolean isBinded = false;
+    private static MeasurementDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textViewInfo = findViewById(R.id.textViewInfo);
+        textViewError = findViewById(R.id.textViewError);
+        dbHelper = new MeasurementDbHelper(this);
     }
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -56,14 +69,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void executeMeasurement(View view) {
-        Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                String value = measurementExecutorService.executeMeasurement();
-                textViewInfo.setText(String.format("Received value: %s", value));
+        new Handler().post(() -> {
+            SensorResponse response = measurementExecutorService.executeMeasurement();
+            try {
+                dbHelper.addRecord(response.getTemperature(), response.getHumidity());
+                textViewError.setText("");
+                textViewInfo.setText(String.format("Temperature: %s °C \nHumidity: %s %%", response.getTemperature(), response.getHumidity()));
+                Toast.makeText(this, "Data added to database", Toast.LENGTH_LONG).show();
+
+            } catch (NullPointerException e) {
+                textViewInfo.setText("");
+                textViewError.setText("Can not connect to sensor");
+                Toast.makeText(this, "can not add data to database", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public void showHistory(View view) {
+        Intent intent = new Intent(this, ShowMeasurements.class);
+        startActivity(intent);
     }
 
 }

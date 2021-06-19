@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.example.sensormanagement.SensorClient;
+import com.example.sensormanagement.dto.SensorResponse;
 
 public class MeasurementExecutorService extends Service {
     private final MeasurementExecutorServiceBinder binder = new MeasurementExecutorServiceBinder();
@@ -23,12 +24,14 @@ public class MeasurementExecutorService extends Service {
         }
     }
 
-    public String executeMeasurement() {
+    public SensorResponse executeMeasurement() {
         Log.v("Service", "executed");
         SensorClient sensorClient = new SensorClient();
         AsyncTask.execute(sensorClient);
         while (sensorClient.isWaiting()) {}
-        return sensorClient.getResponse();
+        Log.v("Service", "got response");
+        String response = sensorClient.getResponse();
+        return SensorResponse.dtoToEntityMapper().apply(response);
     }
 
 }
