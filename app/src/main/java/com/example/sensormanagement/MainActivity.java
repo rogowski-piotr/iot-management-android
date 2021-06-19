@@ -23,9 +23,6 @@ import com.example.sensormanagement.dto.SensorResponse;
 import com.example.sensormanagement.service.MeasurementExecutorService;
 
 public class MainActivity extends AppCompatActivity {
-    public static int minValue;
-    public static int maxValue;
-    public static String type;
     private TextView textViewInfo;
     private TextView textViewError;
     private TextView textViewMinValue;
@@ -54,21 +51,10 @@ public class MainActivity extends AppCompatActivity {
         adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_item);
         spinner.setAdapter(adapterSpinner);
 
-        spinner.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        type = adapterView.getSelectedItem().toString();
-                    }
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {}
-                });
-
         seekBarMin.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 textViewMinValue.setText(String.valueOf(progress));
-                minValue = progress;
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) { }
@@ -80,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 textViewMaxValue.setText(String.valueOf(progress));
-                maxValue = progress;
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) { }
@@ -136,7 +121,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showHistory(View view) {
+        Bundle bundle = new Bundle();
+        bundle.putString("type", spinner.getSelectedItem().toString());
+        bundle.putFloat("min", seekBarMin.getProgress());
+        bundle.putFloat("max", seekBarMax.getProgress());
         Intent intent = new Intent(this, ShowMeasurements.class);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 

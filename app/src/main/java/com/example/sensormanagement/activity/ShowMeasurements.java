@@ -1,17 +1,12 @@
 package com.example.sensormanagement.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.example.sensormanagement.MainActivity;
 import com.example.sensormanagement.R;
 import com.example.sensormanagement.database.MeasurementDbHelper;
-import com.example.sensormanagement.dto.SensorResponse;
-
-import java.util.List;
 
 public class ShowMeasurements extends AppCompatActivity {
 
@@ -24,10 +19,16 @@ public class ShowMeasurements extends AppCompatActivity {
         setContentView(R.layout.activity_show_measurements);
         listView = findViewById(R.id.ListViewMeasurements);
 
-        dbHelper = new MeasurementDbHelper(this);
-        Toast.makeText(this, "Found " + dbHelper.countRecord() + " elements", Toast.LENGTH_LONG).show();
+        Bundle bundle = getIntent().getExtras();
+        float max = bundle.getFloat("max");
+        float min = bundle.getFloat("min");
+        String type = bundle.getString("type");
 
-        MeasurementsAdapter adapter = new MeasurementsAdapter(this, dbHelper.readAll());
+        dbHelper = new MeasurementDbHelper(this);
+        Cursor results = dbHelper.readAll(min, max, type);
+        Toast.makeText(this, "Found " + results.getCount() + " elements", Toast.LENGTH_LONG).show();
+
+        MeasurementsAdapter adapter = new MeasurementsAdapter(this, results);
         listView.setAdapter(adapter);
     }
 }

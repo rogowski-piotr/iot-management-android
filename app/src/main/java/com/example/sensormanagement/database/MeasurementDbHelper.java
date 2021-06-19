@@ -50,19 +50,21 @@ public class MeasurementDbHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public int countRecord() {
+    public int countRecords() {
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("Select COUNT(*) from " + TABLE_NAME, null);
         cursor.moveToNext();
         return cursor.getInt(0);
     }
 
-    public Cursor readAll() {
+    public Cursor readAll(float minValue, float maxValue, String type) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor;
         String[] columns = new String[] {"_id", "DATE", "TEMPERATURE", "HUMIDITY"};
-        cursor = db.query(TABLE_NAME, columns, null, null, null, null, null);
-        return cursor;
+        String selection = type.equals("Temperature")
+                ? "TEMPERATURE >= ? AND TEMPERATURE <= ?"
+                : "HUMIDITY >= ? AND HUMIDITY <= ?";
+        String[] selectionArgs = new String[] {String.valueOf(minValue), String.valueOf(maxValue)};
+        return db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
     }
 
 }
