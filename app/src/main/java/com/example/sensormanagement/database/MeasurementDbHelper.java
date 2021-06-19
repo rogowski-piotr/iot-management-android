@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 
@@ -58,13 +59,19 @@ public class MeasurementDbHelper extends SQLiteOpenHelper {
     }
 
     public Cursor readAll(float minValue, float maxValue, String type) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase database = this.getReadableDatabase();
         String[] columns = new String[] {"_id", "DATE", "TEMPERATURE", "HUMIDITY"};
         String selection = type.equals("Temperature")
                 ? "TEMPERATURE >= ? AND TEMPERATURE <= ?"
                 : "HUMIDITY >= ? AND HUMIDITY <= ?";
         String[] selectionArgs = new String[] {String.valueOf(minValue), String.valueOf(maxValue)};
-        return db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        return database.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+    }
+
+    public boolean deleteRecord(int id) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        database.delete(TABLE_NAME, "_id=?", new String[] {String.valueOf(id)});
+        return true;
     }
 
 }

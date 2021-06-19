@@ -12,11 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.sensormanagement.R;
+import com.example.sensormanagement.database.MeasurementDbHelper;
 
 public class MeasurementsAdapter extends CursorAdapter {
+    private MeasurementDbHelper dbHelper;
 
     public MeasurementsAdapter(Context context, Cursor c) {
         super(context, c);
+        dbHelper = new MeasurementDbHelper(context);
     }
 
     @Override
@@ -29,7 +32,9 @@ public class MeasurementsAdapter extends CursorAdapter {
         TextView textViewDate = (TextView) view.findViewById(R.id.textViewDate);
         TextView textViewHumidity = (TextView) view.findViewById(R.id.textViewHumidity);
         TextView textViewTemperature = (TextView) view.findViewById(R.id.textViewTemperature);
+        Button buttonDelete = (Button) view.findViewById(R.id.buttonDelete);
 
+        int elementId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
         String humidity = String.valueOf(cursor.getFloat(cursor.getColumnIndexOrThrow("HUMIDITY")));
         String temperature = String.valueOf(cursor.getFloat(cursor.getColumnIndexOrThrow("TEMPERATURE")));
         String date = cursor.getString(cursor.getColumnIndexOrThrow("DATE"));
@@ -37,5 +42,14 @@ public class MeasurementsAdapter extends CursorAdapter {
         textViewDate.setText(date);
         textViewHumidity.setText(humidity);
         textViewTemperature.setText(temperature);
+
+        buttonDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.v("Button test", "clicked " + elementId);
+                dbHelper.deleteRecord(elementId);
+            }
+        });
     }
+
 }
