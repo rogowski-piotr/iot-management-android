@@ -6,13 +6,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,11 +22,17 @@ import com.example.sensormanagement.database.MeasurementDbHelper;
 import com.example.sensormanagement.dto.SensorResponse;
 import com.example.sensormanagement.service.MeasurementExecutorService;
 
-import java.time.LocalDateTime;
-
 public class MainActivity extends AppCompatActivity {
+    public static int minValue;
+    public static int maxValue;
+    public static String type;
     private TextView textViewInfo;
     private TextView textViewError;
+    private TextView textViewMinValue;
+    private TextView textViewMaxValue;
+    private SeekBar seekBarMin;
+    private SeekBar seekBarMax;
+    private Spinner spinner;
     private MeasurementExecutorService measurementExecutorService;
     private boolean isBinded = false;
     private static MeasurementDbHelper dbHelper;
@@ -36,7 +43,50 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         textViewInfo = findViewById(R.id.textViewInfo);
         textViewError = findViewById(R.id.textViewError);
+        textViewMinValue = findViewById(R.id.textViewMin);
+        textViewMaxValue = findViewById(R.id.textViewMax);
+        seekBarMin = findViewById(R.id.seekBarMin);
+        seekBarMax = findViewById(R.id.seekBarMax);
+        spinner = findViewById(R.id.spinner);
         dbHelper = new MeasurementDbHelper(this);
+
+        ArrayAdapter<CharSequence> adapterSpinner = ArrayAdapter.createFromResource(this, R.array.types, android.R.layout.simple_spinner_item);
+        adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        spinner.setAdapter(adapterSpinner);
+
+        spinner.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        type = adapterView.getSelectedItem().toString();
+                    }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {}
+                });
+
+        seekBarMin.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                textViewMinValue.setText(String.valueOf(progress));
+                minValue = progress;
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
+
+        seekBarMax.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                textViewMaxValue.setText(String.valueOf(progress));
+                maxValue = progress;
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
     }
 
     private ServiceConnection serviceConnection = new ServiceConnection() {

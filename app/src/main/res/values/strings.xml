@@ -3,4 +3,9 @@
     <string name="buttonMeasureText">measure</string>
     <string name="buttonHistoryText">history</string>
     <string name="buttonAggregationText">aggregation</string>
+
+    <string-array name="types">
+        <item> Temperature</item>
+        <item> Humidity</item>
+    </string-array>
 </resources>
