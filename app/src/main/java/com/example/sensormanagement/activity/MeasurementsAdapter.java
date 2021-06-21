@@ -1,7 +1,9 @@
 package com.example.sensormanagement.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,8 +48,11 @@ public class MeasurementsAdapter extends CursorAdapter {
         buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v("Button test", "clicked " + elementId);
-                dbHelper.deleteRecord(elementId);
+                Bundle bundle = new Bundle();
+                bundle.putInt("id", elementId);
+                Intent intent = new Intent(context, ShowMeasurement.class);
+                intent.putExtras(bundle);
+                context.startActivity(intent);
             }
         });
     }
