@@ -42,8 +42,8 @@ public class MeasurementsAdapter extends CursorAdapter {
         String date = cursor.getString(cursor.getColumnIndexOrThrow("DATE"));
 
         textViewDate.setText(date);
-        textViewHumidity.setText(humidity);
-        textViewTemperature.setText(temperature);
+        textViewHumidity.setText(humidity + " %");
+        textViewTemperature.setText(temperature + " °C");
 
         buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
