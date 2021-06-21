@@ -74,4 +74,12 @@ public class MeasurementDbHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public Cursor getOneRecord(int id) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        String[] columns = new String[] {"_id", "DATE", "TEMPERATURE", "HUMIDITY"};
+        String selection = "_id = ?";
+        String[] selectionArgs = new String[] {String.valueOf(id)};
+        return database.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+    }
+
 }
